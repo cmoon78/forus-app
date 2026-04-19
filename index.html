@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>ForUs — Wedding Planner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --pink: #D4537E;
+      --pink-light: #FBEAF0;
+      --pink-mid: #F4C0D1;
+      --pink-dark: #993556;
+      --pink-darker: #72243E;
+      --green-light: #EAF3DE;
+      --green: #3B6D11;
+      --blue-light: #E6F1FB;
+      --blue: #185FA5;
+      --text: #1a1a1a;
+      --text-mid: #666;
+      --text-light: #999;
+      --border: rgba(0,0,0,0.1);
+      --bg: #fff;
+      --bg2: #f7f5f3;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg2); min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 20px 0; }
+    .app { width: 100%; max-width: 430px; background: var(--bg); min-height: 100vh; display: flex; flex-direction: column; position: relative; box-shadow: 0 0 40px rgba(0,0,0,0.08); }
+
+    /* STATUS BAR */
+    .status { padding: 12px 20px 0; display: flex; justify-content: space-between; font-size: 12px; color: var(--text-light); }
+
+    /* TOP NAV */
+    .topnav { padding: 10px 20px 14px; display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text); letter-spacing: -0.5px; }
+    .logo em { color: var(--pink); font-style: normal; }
+    .couple-pill { display: flex; align-items: center; gap: 5px; background: var(--bg2); border: 0.5px solid var(--border); border-radius: 20px; padding: 5px 11px; font-size: 12px; color: var(--text-mid); }
+    .av { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 500; }
+    .av1 { background: var(--pink-light); color: var(--pink-dark); }
+    .av2 { background: var(--blue-light); color: var(--blue); }
+
+    /* SCREENS */
+    .screen { display: none; flex: 1; flex-direction: column; overflow-y: auto; padding-bottom: 80px; }
+    .screen.active { display: flex; }
+
+    /* BOTTOM NAV */
+    .botnav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: var(--bg); border-top: 0.5px solid var(--border); display: flex; padding: 10px 0 24px; z-index: 100; }
+    .ni { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; padding: 4px 0; }
+    .ni svg { width: 22px; height: 22px; }
+    .ni span { font-size: 10px; color: var(--text-light); }
+    .ni.active span { color: var(--pink); }
+    .ni.active svg path, .ni.active svg rect, .ni.active svg circle { fill: var(--pink) !important; stroke: none !important; }
+    .ni.active svg .stroke-only { fill: none !important; stroke: var(--pink) !important; }
+
+    /* DIVIDER */
+    .div { height: 0.5px; background: var(--border); margin: 0 20px; }
+
+    /* SECTION */
+    .sec { padding: 14px 20px; }
+    .sec-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .sec-title { font-size: 12px; font-weight: 500; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; }
+    .sec-action { font-size: 12px; color: var(--pink); cursor: pointer; }
+
+    /* PILLS */
+    .pill { font-size: 10px; padding: 2px 7px; border-radius: 8px; font-weight: 500; }
+    .pill-kr { background: var(--green-light); color: var(--green); }
+    .pill-hk { background: var(--blue-light); color: var(--blue); }
+    .pill-both { background: var(--pink-light); color: var(--pink-dark); }
+    .pill-ai { background: var(--pink-light); color: var(--pink-dark); }
+
+    /* ===== HOME ===== */
+    .dday { margin: 0 20px 14px; background: var(--pink-light); border-radius: var(--radius); padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .dday-num { font-family: 'DM Serif Display', serif; font-size: 52px; color: var(--pink-darker); line-height: 1; }
+    .dday-lbl { font-size: 11px; color: var(--pink-dark); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .dday-sub { font-size: 12px; color: var(--pink-dark); margin-top: 5px; }
+    .dday-right { text-align: right; }
+    .dday-date { font-size: 14px; color: var(--pink-dark); font-weight: 500; margin-bottom: 8px; }
+    .venue-tag { font-size: 11px; background: rgba(212,83,126,0.12); color: var(--pink-dark); border-radius: 10px; padding: 3px 9px; margin-bottom: 4px; display: inline-block; }
+
+    .check-item { display: flex; align-items: center; gap: 10px; padding: 11px 13px; background: var(--bg2); border-radius: var(--radius-sm); border: 0.5px solid var(--border); cursor: pointer; margin-bottom: 6px; transition: opacity 0.2s; }
+    .check-item.done { opacity: 0.4; }
+    .cb { width: 19px; height: 19px; border-radius: 50%; border: 1.5px solid #ccc; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
+    .cb.on { background: var(--pink); border-color: var(--pink); }
+    .ck { width: 8px; height: 8px; border-right: 1.5px solid white; border-bottom: 1.5px solid white; transform: rotate(45deg) translate(-1px,-1px); display: none; }
+    .cb.on .ck { display: block; }
+    .ci { flex: 1; }
+    .ci-t { font-size: 13px; color: var(--text); }
+    .ci-m { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+
+    .snap-card { background: var(--bg2); border-radius: var(--radius); border: 0.5px solid var(--border); padding: 14px 16px; }
+    .snap-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .snap-big { font-size: 20px; font-weight: 500; color: var(--text); }
+    .snap-spent { font-size: 15px; font-weight: 500; color: var(--pink); }
+    .prog-bg { height: 6px; background: rgba(212,83,126,0.15); border-radius: 3px; overflow: hidden; margin-bottom: 6px; }
+    .prog-fg { height: 100%; background: var(--pink); border-radius: 3px; }
+    .snap-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-light); }
+
+    .msg-preview { display: flex; flex-direction: column; gap: 7px; }
+    .bub { max-width: 78%; padding: 9px 12px; font-size: 13px; line-height: 1.45; }
+    .bub.them { background: var(--bg2); color: var(--text); border-radius: 4px 13px 13px 13px; }
+    .bub.me { background: var(--pink); color: white; border-radius: 13px 4px 13px 13px; align-self: flex-end; }
+    .msg-t { font-size: 10px; color: var(--text-light); margin-top: 2px; }
+    .msg-t.r { text-align: right; }
+
+    /* ===== CHECKLIST ===== */
+    .cl-top { padding: 14px 20px 10px; }
+    .cl-filters { display: flex; gap: 6px; flex-wrap: wrap; }
+    .cf { font-size: 11px; padding: 5px 11px; border-radius: 12px; border: 0.5px solid var(--border); cursor: pointer; color: var(--text-mid); background: var(--bg); transition: all 0.15s; }
+    .cf.on { background: var(--pink); color: white; border-color: var(--pink); }
+    .cl-body { padding: 4px 20px 0; }
+    .grp { margin-bottom: 16px; }
+    .grp-lbl { font-size: 10px; font-weight: 500; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 7px; display: flex; align-items: center; gap: 7px; }
+    .grp-line { flex: 1; height: 0.5px; background: var(--border); }
+    .cl-i { display: flex; align-items: flex-start; gap: 9px; padding: 10px 12px; border-radius: var(--radius-sm); border: 0.5px solid var(--border); background: var(--bg); margin-bottom: 5px; cursor: pointer; transition: opacity 0.2s; }
+    .cl-i.done { opacity: 0.38; background: var(--bg2); }
+    .pdot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+    .ph { background: #E24B4A; }
+    .pm { background: #EF9F27; }
+    .pl { background: #639922; }
+    .cl-body-i { flex: 1; }
+    .cl-title { font-size: 13px; color: var(--text); line-height: 1.3; }
+    .cl-meta { display: flex; gap: 5px; align-items: center; margin-top: 4px; flex-wrap: wrap; }
+    .due { font-size: 10px; color: var(--text-light); }
+    .due.urg { color: #E24B4A; font-weight: 500; }
+    .ai-note { font-size: 10px; color: var(--pink-dark); font-style: italic; }
+
+    /* AI GENERATE */
+    .ai-box { margin: 0 20px 14px; background: var(--pink-light); border-radius: var(--radius); padding: 16px; }
+    .ai-box-title { font-size: 13px; font-weight: 500; color: var(--pink-darker); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+    .ai-field { margin-bottom: 9px; }
+    .ai-field label { font-size: 11px; color: var(--pink-dark); font-weight: 500; display: block; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.4px; }
+    .ai-field input { width: 100%; padding: 8px 11px; border-radius: var(--radius-sm); border: 0.5px solid var(--pink-mid); background: white; font-size: 13px; color: var(--text); font-family: 'DM Sans', sans-serif; }
+    .ai-field input:focus { outline: none; border-color: var(--pink); }
+    .ai-row2 { display: flex; gap: 8px; }
+    .ai-row2 .ai-field { flex: 1; }
+    .ai-btn { width: 100%; padding: 11px; background: var(--pink); color: white; border: none; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 4px; }
+    .ai-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .key-box { margin: 14px 20px 0; background: var(--bg2); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 12px 14px; }
+    .key-row { display: flex; gap: 7px; align-items: center; }
+    .key-inp { flex: 1; padding: 7px 11px; border-radius: var(--radius-sm); border: 0.5px solid var(--border); background: white; font-size: 12px; font-family: monospace; color: var(--text); }
+    .key-inp:focus { outline: none; border-color: var(--pink); }
+    .key-btn { padding: 7px 13px; background: var(--pink); color: white; border: none; border-radius: var(--radius-sm); font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+    .key-status { font-size: 11px; margin-top: 6px; color: var(--text-light); }
+    .key-status.ok { color: var(--green); }
+    .key-status.err { color: #E24B4A; }
+
+    /* ===== US TAB ===== */
+    .thread-list { display: flex; flex-direction: column; }
+    .thread { display: flex; gap: 12px; align-items: flex-start; padding: 13px 20px; border-bottom: 0.5px solid var(--border); cursor: pointer; transition: background 0.1s; }
+    .thread:hover { background: var(--bg2); }
+    .t-icon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .t-body { flex: 1; }
+    .t-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; }
+    .t-name { font-size: 14px; font-weight: 500; color: var(--text); }
+    .t-time { font-size: 11px; color: var(--text-light); }
+    .t-prev { font-size: 12px; color: var(--text-mid); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 230px; }
+    .t-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--pink); margin-top: 5px; flex-shrink: 0; }
+
+    .chat-view { display: none; flex-direction: column; height: 100%; }
+    .chat-view.open { display: flex; }
+    .chat-hd { padding: 10px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 0.5px solid var(--border); }
+    .back { font-size: 22px; color: var(--pink); cursor: pointer; line-height: 1; }
+    .chat-msgs { flex: 1; padding: 14px 16px; display: flex; flex-direction: column; gap: 9px; overflow-y: auto; min-height: 360px; }
+    .mw { display: flex; flex-direction: column; }
+    .mw.me { align-items: flex-end; }
+    .chat-in-area { padding: 10px 16px; display: flex; gap: 8px; border-top: 0.5px solid var(--border); }
+    .chat-inp { flex: 1; padding: 9px 13px; border-radius: 22px; border: 0.5px solid var(--border); background: var(--bg2); font-size: 13px; color: var(--text); font-family: 'DM Sans', sans-serif; }
+    .chat-inp:focus { outline: none; border-color: var(--pink); }
+    .send { width: 36px; height: 36px; border-radius: 50%; background: var(--pink); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+    /* ===== BUDGET ===== */
+    .bud-top { margin: 0 20px 12px; background: var(--pink-light); border-radius: var(--radius); padding: 18px 18px 14px; }
+    .bud-big { font-family: 'DM Serif Display', serif; font-size: 36px; color: var(--pink-darker); margin-bottom: 2px; }
+    .bud-lbl { font-size: 11px; color: var(--pink-dark); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+    .bud-stats { display: flex; justify-content: space-between; font-size: 11px; color: var(--pink-dark); margin-top: 6px; }
+    .btabs { display: flex; gap: 6px; margin: 0 20px 12px; }
+    .btab { flex: 1; padding: 8px; text-align: center; font-size: 12px; border-radius: var(--radius-sm); border: 0.5px solid var(--border); cursor: pointer; color: var(--text-mid); transition: all 0.15s; }
+    .btab.on { background: var(--pink); color: white; border-color: var(--pink); }
+    .bsec { padding: 0 20px; display: none; }
+    .bsec.on { display: block; }
+    .bi { display: flex; align-items: center; gap: 10px; padding: 11px 13px; border-radius: var(--radius-sm); border: 0.5px solid var(--border); background: var(--bg); margin-bottom: 6px; }
+    .bi-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+    .bi-name { font-size: 13px; color: var(--text); flex: 1; }
+    .bi-amt { font-size: 13px; font-weight: 500; color: var(--text); }
+    .bi-st { font-size: 10px; margin-top: 1px; }
+    .paid { color: var(--green); }
+    .pend { color: #BA7517; }
+    .add-row { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 11px; border-radius: var(--radius-sm); border: 1px dashed #ccc; color: var(--pink); font-size: 13px; cursor: pointer; margin-top: 4px; }
+
+    /* ===== TIMELINE ===== */
+    .tl-tabs { display: flex; gap: 6px; margin: 0 20px 14px; }
+    .tlt { flex: 1; padding: 8px; text-align: center; font-size: 12px; border-radius: var(--radius-sm); border: 0.5px solid var(--border); cursor: pointer; color: var(--text-mid); transition: all 0.15s; }
+    .tlt.on-all { background: var(--pink-light); color: var(--pink-dark); border-color: var(--pink-mid); }
+    .tlt.on-kr { background: var(--green-light); color: var(--green); border-color: #C0DD97; }
+    .tlt.on-hk { background: var(--blue-light); color: var(--blue); border-color: #B5D4F4; }
+    .tl { padding: 0 20px; }
+    .tl-item { display: flex; gap: 14px; padding-bottom: 20px; }
+    .tl-left { display: flex; flex-direction: column; align-items: center; width: 30px; flex-shrink: 0; }
+    .tl-dot { width: 13px; height: 13px; border-radius: 50%; border: 2px solid; flex-shrink: 0; }
+    .tl-line { width: 1.5px; flex: 1; background: var(--border); margin-top: 4px; }
+    .tl-r { flex: 1; }
+    .tl-month { font-size: 10px; font-weight: 500; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
+    .tl-t { font-size: 13px; font-weight: 500; color: var(--text); }
+    .tl-d { font-size: 11px; color: var(--text-mid); margin-top: 2px; }
+    .tl-tags { display: flex; gap: 4px; margin-top: 5px; flex-wrap: wrap; }
+
+    /* LOADING */
+    .spinner { width: 26px; height: 26px; border: 2px solid var(--pink-mid); border-top-color: var(--pink); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading { display: flex; flex-direction: column; align-items: center; padding: 30px; gap: 10px; }
+    .loading p { font-size: 12px; color: var(--pink-dark); }
+    .err-box { background: #FCEBEB; border-radius: var(--radius-sm); padding: 12px; font-size: 12px; color: #A32D2D; margin: 10px 20px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="status"><span>9:41</span><span>HKG ✦</span></div>
+  <div class="topnav">
+    <div class="logo">For<em>Us</em></div>
+    <div class="couple-pill">
+      <div class="av av1">CY</div>
+      <span>+</span>
+      <div class="av av2">JY</div>
+      <span>our wedding</span>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <div class="screen active" id="s-home">
+    <div class="dday">
+      <div>
+        <div class="dday-lbl">days to go</div>
+        <div class="dday-num" id="dday-num">218</div>
+        <div class="dday-sub">Korea ceremony</div>
+      </div>
+      <div class="dday-right">
+        <div class="dday-date">Nov 23, 2026</div>
+        <div><div class="venue-tag">Seoul, Korea</div></div>
+        <div><div class="venue-tag">Hong Kong</div></div>
+      </div>
+    </div>
+    <div class="div"></div>
+    <div class="sec">
+      <div class="sec-head">
+        <div style="display:flex;align-items:center;gap:6px;"><span class="sec-title">This week</span><span class="pill pill-ai">AI</span></div>
+        <span class="sec-action" onclick="switchTab('checklist')">See all</span>
+      </div>
+      <div class="check-item" onclick="toggleChk(this)">
+        <div class="cb"><div class="ck"></div></div>
+        <div class="ci">
+          <div style="display:flex;justify-content:space-between;align-items:center;"><span class="ci-t">Book venue deposit</span><span class="pill pill-kr">Korea</span></div>
+          <div class="ci-m">Due in 3 days — urgent</div>
+        </div>
+      </div>
+      <div class="check-item done" onclick="toggleChk(this)">
+        <div class="cb on"><div class="ck"></div></div>
+        <div class="ci">
+          <div style="display:flex;justify-content:space-between;align-items:center;"><span class="ci-t">Meet both families</span><span class="pill pill-both">Both</span></div>
+          <div class="ci-m">Completed ✓</div>
+        </div>
+      </div>
+      <div class="check-item" onclick="toggleChk(this)">
+        <div class="cb"><div class="ck"></div></div>
+        <div class="ci">
+          <div style="display:flex;justify-content:space-between;align-items:center;"><span class="ci-t">Confirm HK guest list</span><span class="pill pill-hk">HK</span></div>
+          <div class="ci-m">Due this week</div>
+        </div>
+      </div>
+    </div>
+    <div class="div"></div>
+    <div class="sec">
+      <div class="sec-head"><span class="sec-title">Budget snapshot</span><span class="sec-action" onclick="switchTab('budget')">Details</span></div>
+      <div class="snap-card">
+        <div class="snap-row">
+          <div><div style="font-size:11px;color:var(--text-light);margin-bottom:2px;">total</div><div class="snap-big">HKD 380,000</div></div>
+          <div style="text-align:right;"><div style="font-size:11px;color:var(--text-light);margin-bottom:2px;">spent</div><div class="snap-spent">HKD 159,600</div></div>
+        </div>
+        <div class="prog-bg"><div class="prog-fg" style="width:42%;"></div></div>
+        <div class="snap-meta"><span>HK: 80K</span><span style="color:var(--pink);font-weight:500;">42% used</span><span>Korea: 300K</span></div>
+      </div>
+    </div>
+    <div class="div"></div>
+    <div class="sec">
+      <div class="sec-head"><span class="sec-title">Latest from Us</span><span class="sec-action" onclick="switchTab('us')">Open</span></div>
+      <div class="msg-preview">
+        <div><div class="bub them">50 or 80 people for the HK dinner?</div><div class="msg-t">Jimmy, 2:14 PM</div></div>
+        <div style="align-items:flex-end;display:flex;flex-direction:column;"><div class="bub me">I think 50 is more intimate 💕</div><div class="msg-t r">You, 2:31 PM</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECKLIST -->
+  <div class="screen" id="s-checklist">
+    <div class="key-box">
+      <div style="font-size:11px;color:var(--text-light);font-weight:500;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:7px;">🔐 Claude API Key</div>
+      <div class="key-row">
+        <input class="key-inp" type="password" id="api-key" placeholder="sk-ant-api03-...">
+        <button class="key-btn" onclick="saveKey()">Save</button>
+      </div>
+      <div class="key-status" id="key-status">Enter your key to enable AI checklist generation</div>
+    </div>
+    <div class="ai-box" style="margin-top:12px;">
+      <div class="ai-box-title">✨ Generate AI checklist</div>
+      <div class="ai-row2">
+        <div class="ai-field"><label>Korea date</label><input type="date" id="dt-kr" value="2026-11-23"></div>
+        <div class="ai-field"><label>HK date</label><input type="date" id="dt-hk" value="2026-10-10"></div>
+      </div>
+      <div class="ai-row2">
+        <div class="ai-field"><label>Your name</label><input type="text" id="nm1" value="ChaeYoung"></div>
+        <div class="ai-field"><label>Partner</label><input type="text" id="nm2" value="Jimmy"></div>
+      </div>
+      <div class="ai-field"><label>Notes</label><input type="text" id="notes" value="Korean-HK cross-cultural, 2 ceremonies"></div>
+      <button class="ai-btn" id="gen-btn" onclick="generateAI()">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1L8.5 5.5H13L9.5 8.5L11 13L7 10L3 13L4.5 8.5L1 5.5H5.5L7 1Z" fill="white"/></svg>
+        Generate my checklist
+      </button>
+    </div>
+    <div style="padding:4px 20px;">
+      <div class="cl-filters" id="cl-filters">
+        <div class="cf on" onclick="filterCL(this,'all')">All</div>
+        <div class="cf" onclick="filterCL(this,'kr')">Korea</div>
+        <div class="cf" onclick="filterCL(this,'hk')">HK</div>
+        <div class="cf" onclick="filterCL(this,'both')">Both</div>
+        <div class="cf" onclick="filterCL(this,'high')">Urgent</div>
+      </div>
+    </div>
+    <div class="cl-body" id="cl-body">
+      <div style="text-align:center;padding:24px 0;color:var(--text-light);font-size:13px;line-height:1.7;">Save your API key above,<br>then generate your personalized checklist 💍</div>
+    </div>
+  </div>
+
+  <!-- US -->
+  <div class="screen" id="s-us">
+    <div id="us-list">
+      <div style="padding:14px 20px 10px;"><span style="font-size:16px;font-weight:500;">Us</span></div>
+      <div class="thread-list" id="thread-list"></div>
+    </div>
+    <div class="chat-view" id="chat-view">
+      <div class="chat-hd">
+        <div class="back" onclick="closeChat()">‹</div>
+        <div><div style="font-size:15px;font-weight:500;" id="chat-title">General</div><div style="font-size:11px;color:var(--text-light);">CY + JY · private</div></div>
+      </div>
+      <div class="chat-msgs" id="chat-msgs"></div>
+      <div class="chat-in-area">
+        <input class="chat-inp" id="chat-inp" placeholder="Message Jimmy..." onkeydown="if(event.key==='Enter')sendMsg()">
+        <button class="send" onclick="sendMsg()"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7L13 1L9 13L7 8L1 7Z" fill="white"/></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BUDGET -->
+  <div class="screen" id="s-budget">
+    <div class="bud-top">
+      <div class="bud-lbl">total budget</div>
+      <div class="bud-big">HKD 380,000</div>
+      <div class="prog-bg"><div class="prog-fg" style="width:42%;"></div></div>
+      <div class="bud-stats"><span>Spent: HKD 159,600</span><span>42%</span><span>Left: HKD 220,400</span></div>
+    </div>
+    <div class="btabs">
+      <div class="btab on" onclick="switchBudget(this,'all')">All</div>
+      <div class="btab" onclick="switchBudget(this,'hk')">Hong Kong</div>
+      <div class="btab" onclick="switchBudget(this,'kr')">Korea</div>
+    </div>
+    <div class="bsec on" id="b-all">
+      <div class="bi"><div class="bi-dot" style="background:#D4537E;"></div><div class="bi-name">Korea venue</div><div><div class="bi-amt">HKD 180,000</div><div class="bi-st pend">⏳ 30% paid</div></div></div>
+      <div class="bi"><div class="bi-dot" style="background:#378ADD;"></div><div class="bi-name">HK dinner venue</div><div><div class="bi-amt">HKD 60,000</div><div class="bi-st pend">⏳ pending</div></div></div>
+      <div class="bi"><div class="bi-dot" style="background:#639922;"></div><div class="bi-name">스드메 (Studio, Dress, MU)</div><div><div class="bi-amt">HKD 70,000</div><div class="bi-st paid">✓ deposit paid</div></div></div>
+      <div class="bi"><div class="bi-dot" style="background:#EF9F27;"></div><div class="bi-name">Photography</div><div><div class="bi-amt">HKD 28,000</div><div class="bi-st paid">✓ booked</div></div></div>
+      <div class="bi"><div class="bi-dot" style="background:#7F77DD;"></div><div class="bi-name">Flowers & decor</div><div><div class="bi-amt">HKD 22,000</div><div class="bi-st pend">⏳ TBD</div></div></div>
+      <div class="bi"><div class="bi-dot" style="background:#888;"></div><div class="bi-name">Buffer / misc</div><div><div class="bi-amt">HKD 20,000</div><div class="bi-st pend">—</div></div></div>
+      <div class="add-row">+ Add expense</div>
+    </div>
+    <div class="bsec" id="b-hk">
+      <div class="bi"><div class="bi-dot" style="background:#378ADD;"></div><div class="bi-name">HK dinner venue</div><div><div class="bi-amt">HKD 60,000</div><div class="bi-st pend">⏳ pending</div></div></div>
+      <div class="bi"><div class="bi-dot" style="background:#7F77DD;"></div><div class="bi-name">HK flowers & decor</div><div><div class="bi-amt">HKD 10,000</div><div class="bi-st pend">⏳ TBD</div></div></div>
+      <div class="bi"><div class="bi-dot" style="background:#888;"></div><div class="bi-name">HK miscellaneous</div><div><div class="bi-amt">HKD 10,000</div><div class="bi-st pend">—</div></div></div>
+      <div style="margin-top:10px;padding:10px 12px;background:var(--blue-light);border-radius:var(--radius-sm);font-size:12px;color:var(--blue);">HK total: HKD 80,000</div>
+      <div class="add-row">+ Add HK expense</div>
+    </div>
+    <div class="bsec" id="b-kr">
+      <div class="bi"><div class="bi-dot" style="background:#D4537E;"></div><div class="bi-name">Korea venue</div><div><div class="bi-amt">HKD 180,000</div><div class="bi-st pend">⏳ 30% paid</div></div></div>
+      <div class="bi"><div class="bi-dot" style="background:#639922;"></div><div class="bi-name">스드메 (Studio, Dress, MU)</div><div><div class="bi-amt">HKD 70,000</div><div class="bi-st paid">✓ deposit paid</div></div></div>
+      <div class="bi"><div class="bi-dot" style="background:#EF9F27;"></div><div class="bi-name">Photography</div><div><div class="bi-amt">HKD 28,000</div><div class="bi-st paid">✓ booked</div></div></div>
+      <div class="bi"><div class="bi-dot" style="background:#7F77DD;"></div><div class="bi-name">Korea flowers & decor</div><div><div class="bi-amt">HKD 12,000</div><div class="bi-st pend">⏳ TBD</div></div></div>
+      <div class="bi"><div class="bi-dot" style="background:#888;"></div><div class="bi-name">Korea miscellaneous</div><div><div class="bi-amt">HKD 10,000</div><div class="bi-st pend">—</div></div></div>
+      <div style="margin-top:10px;padding:10px 12px;background:var(--green-light);border-radius:var(--radius-sm);font-size:12px;color:var(--green);">Korea total: HKD 300,000</div>
+      <div class="add-row">+ Add Korea expense</div>
+    </div>
+  </div>
+
+  <!-- TIMELINE -->
+  <div class="screen" id="s-timeline">
+    <div style="padding:14px 20px 10px;"><span style="font-size:16px;font-weight:500;">Timeline</span></div>
+    <div class="tl-tabs">
+      <div class="tlt on-all" onclick="switchTL(this,'all')">All</div>
+      <div class="tlt" onclick="switchTL(this,'kr')">Korea 🇰🇷</div>
+      <div class="tlt" onclick="switchTL(this,'hk')">Hong Kong 🇭🇰</div>
+    </div>
+    <div class="tl" id="tl"></div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="botnav">
+    <div class="ni active" id="ni-home" onclick="switchTab('home')">
+      <svg viewBox="0 0 22 22" fill="none"><path d="M3 11.5L11 4L19 11.5V19H14V14H8V19H3V11.5Z" fill="#ccc"/></svg>
+      <span>Home</span>
+    </div>
+    <div class="ni" id="ni-checklist" onclick="switchTab('checklist')">
+      <svg viewBox="0 0 22 22" fill="none"><rect x="5" y="6" width="12" height="1.5" rx="0.75" fill="#ccc"/><rect x="5" y="10" width="12" height="1.5" rx="0.75" fill="#ccc"/><rect x="5" y="14" width="8" height="1.5" rx="0.75" fill="#ccc"/></svg>
+      <span>Checklist</span>
+    </div>
+    <div class="ni" id="ni-us" onclick="switchTab('us')">
+      <svg viewBox="0 0 22 22" fill="none"><path d="M4 6C4 5.45 4.45 5 5 5H17C17.55 5 18 5.45 18 6V14C18 14.55 17.55 15 17 15H8.5L5 18V15H5C4.45 15 4 14.55 4 14V6Z" fill="#ccc"/></svg>
+      <span>Us</span>
+    </div>
+    <div class="ni" id="ni-budget" onclick="switchTab('budget')">
+      <svg viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="8" stroke="#ccc" stroke-width="1.5" fill="none" class="stroke-only"/><path d="M11 7V8M11 14V15M8.5 10C8.5 9.17 9.17 8.5 10 8.5H12C12.83 8.5 13.5 9.17 13.5 10C13.5 10.83 12.83 11.5 12 11.5H10C9.17 11.5 8.5 12.17 8.5 13C8.5 13.83 9.17 14.5 10 14.5H12C12.83 14.5 13.5 13.83 13.5 13" stroke="#ccc" stroke-width="1.5" fill="none" class="stroke-only"/></svg>
+      <span>Budget</span>
+    </div>
+    <div class="ni" id="ni-timeline" onclick="switchTab('timeline')">
+      <svg viewBox="0 0 22 22" fill="none"><rect x="3" y="5" width="16" height="14" rx="2" stroke="#ccc" stroke-width="1.5" fill="none" class="stroke-only"/><path d="M8 4V6M14 4V6M3 9H19" stroke="#ccc" stroke-width="1.5" class="stroke-only"/></svg>
+      <span>Timeline</span>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──
+const threads = [
+  { id:'general', icon:'💬', bg:'#FBEAF0', name:'General', time:'2:31 PM', preview:'I think 50 is more intimate 💕', unread:true,
+    msgs:[{me:false,text:'Should we invite 50 or 80 people to the HK dinner?',time:'2:14 PM'},{me:true,text:'I think 50 is more intimate 💕',time:'2:31 PM'}]},
+  { id:'budget', icon:'💰', bg:'#EAF3DE', name:'Budget & Finance', time:'Yesterday', preview:'Can we talk about the housing deposit?', unread:true,
+    msgs:[{me:false,text:'Can we talk about the housing deposit?',time:'Yesterday'},{me:true,text:'Yes, let\'s set aside HKD 200K for down payment first',time:'Yesterday'},{me:false,text:'Agreed. Split 50/50?',time:'Yesterday'}]},
+  { id:'family', icon:'👪', bg:'#E6F1FB', name:'Family & Parents', time:'Mon', preview:'My mom asked about the ceremony format',
+    msgs:[{me:false,text:'My mom asked about the ceremony format',time:'Monday'},{me:true,text:'What exactly did she say?',time:'Monday'},{me:false,text:'She wants to know if there will be a 茶道 ceremony',time:'Monday'}]},
+  { id:'venue', icon:'📍', bg:'#FAEEDA', name:'Venues', time:'Sun', preview:'Shortlisted 3 venues in Seoul',
+    msgs:[{me:true,text:'Shortlisted 3 venues in Seoul',time:'Sunday'},{me:false,text:'Oh exciting! Which ones?',time:'Sunday'},{me:true,text:'Shilla Hotel, Conrad Seoul, and a garden venue',time:'Sunday'}]},
+  { id:'wishes', icon:'✨', bg:'#FBEAF0', name:'Wishes & Dreams', time:'Apr 12', preview:'I want white roses everywhere 🌹',
+    msgs:[{me:true,text:'I want white roses everywhere 🌹',time:'Apr 12'},{me:false,text:'And fairy lights! 🌟',time:'Apr 12'}]}
+];
+
+const tlItems = [
+  {tag:'both',dot:'done',month:'Completed',title:'양가 상견례 (Family meeting)',desc:'Both families met ✓',pills:['both']},
+  {tag:'both',dot:'now',month:'Now — April 2026',title:'Venue deposit & guest list',desc:'Confirm venues + finalize numbers',pills:['both'],urgent:true},
+  {tag:'kr',dot:'kr',month:'May 2026',title:'스드메 — Studio, Dress, Makeup',desc:'Book studio + dress + makeup artist in Seoul',pills:['kr']},
+  {tag:'both',dot:'kr',month:'June 2026',title:'Send invitations',desc:'Korea + HK invitations go out (6 months before)',pills:['both']},
+  {tag:'kr',dot:'kr',month:'Aug 2026',title:'Korea pre-wedding shoot',desc:'Pre-wedding photo session in Seoul',pills:['kr']},
+  {tag:'hk',dot:'hk',month:'Sep 2026',title:'HK dinner prep',desc:'Finalize menu, seating, décor for HK dinner',pills:['hk']},
+  {tag:'hk',dot:'hk',month:'Oct 2026',title:'Hong Kong ceremony 🇭🇰',desc:'Intimate dinner with HK family & friends',pills:['hk']},
+  {tag:'kr',dot:'kr',month:'Nov 23, 2026',title:'Korea wedding ceremony 🇰🇷',desc:'Main wedding ceremony in Seoul',pills:['kr']}
+];
+
+// ── INIT ──
+let savedKey = '', curChat = null;
+
+function init() {
+  // D-day calc
+  const target = new Date('2026-11-23');
+  const today = new Date();
+  const diff = Math.ceil((target - today) / 86400000);
+  document.getElementById('dday-num').textContent = diff > 0 ? diff : 0;
+
+  // Threads
+  const tl = document.getElementById('thread-list');
+  tl.innerHTML = threads.map(t => `
+    <div class="thread" onclick="openChat('${t.id}')">
+      <div class="t-icon" style="background:${t.bg}">${t.icon}</div>
+      <div class="t-body">
+        <div class="t-top"><span class="t-name">${t.name}</span><span class="t-time">${t.time}</span></div>
+        <div class="t-prev">${t.preview}</div>
+      </div>
+      ${t.unread ? '<div class="t-dot"></div>' : ''}
+    </div>`).join('');
+
+  // Timeline
+  renderTL('all');
+}
+
+// ── TABS ──
+function switchTab(tab) {
+  ['home','checklist','us','budget','timeline'].forEach(t => {
+    document.getElementById('s-'+t).classList.remove('active');
+    document.getElementById('ni-'+t).classList.remove('active');
+  });
+  document.getElementById('s-'+tab).classList.add('active');
+  document.getElementById('ni-'+tab).classList.add('active');
+}
+
+// ── CHECKLIST ──
+function toggleChk(el) {
+  el.classList.toggle('done');
+  const cb = el.querySelector('.cb');
+  cb.classList.toggle('on');
+}
+
+function saveKey() {
+  const v = document.getElementById('api-key').value.trim();
+  const s = document.getElementById('key-status');
+  if (!v.startsWith('sk-ant-')) { s.textContent = 'Invalid key — must start with sk-ant-'; s.className = 'key-status err'; return; }
+  savedKey = v;
+  s.textContent = '✓ Key saved — ready to generate!';
+  s.className = 'key-status ok';
+  document.getElementById('api-key').value = '••••••••••••••••••••';
+}
+
+function filterCL(el, tag) {
+  document.querySelectorAll('.cf').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  document.querySelectorAll('.cl-i').forEach(i => {
+    const t = i.dataset.tag;
+    i.style.display = (tag === 'all' || t === tag || (tag !== 'high' && t === 'both')) ? '' : 'none';
+    if (tag === 'high') i.style.display = i.dataset.priority === 'high' ? '' : 'none';
+  });
+}
+
+async function generateAI() {
+  if (!savedKey) { document.getElementById('cl-body').innerHTML = '<div class="err-box">Please save your API key first.</div>'; return; }
+  const btn = document.getElementById('gen-btn');
+  const body = document.getElementById('cl-body');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;margin:0;"></div> Generating...';
+  body.innerHTML = '<div class="loading"><div class="spinner"></div><p>Claude is building your checklist...</p></div>';
+  const today = new Date().toISOString().split('T')[0];
+  const prompt = `Wedding checklist for ${document.getElementById('nm1').value} & ${document.getElementById('nm2').value}.
+Today: ${today}. Korea: ${document.getElementById('dt-kr').value}. HK: ${document.getElementById('dt-hk').value}.
+Notes: ${document.getElementById('notes').value}.
+Return ONLY valid JSON:
+{"groups":[{"label":"string","items":[{"title":"string","location":"kr|hk|both","priority":"high|med|low","due":"string","urgent":true|false}]}]}
+15-20 items, 3-4 groups. Include Korean specifics: 스드메, 함, 폐백, 청첩장. Cross-cultural HK-Korea focus.`;
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':savedKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:1000,messages:[{role:'user',content:prompt}]})
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    const parsed = JSON.parse(data.content[0].text.replace(/```json|```/g,'').trim());
+    renderCL(parsed);
+  } catch(e) { body.innerHTML = `<div class="err-box">Error: ${e.message}</div>`; }
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1L8.5 5.5H13L9.5 8.5L11 13L7 10L3 13L4.5 8.5L1 5.5H5.5L7 1Z" fill="white"/></svg> Regenerate';
+}
+
+function renderCL(data) {
+  let total = 0; data.groups.forEach(g => total += g.items.length);
+  let html = `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0 6px;"><span style="font-size:12px;font-weight:500;color:var(--text-mid);">Your checklist</span><span style="font-size:12px;color:var(--pink);">${total} tasks</span></div>`;
+  data.groups.forEach(g => {
+    html += `<div class="grp"><div class="grp-lbl">${g.label}<div class="grp-line"></div></div>`;
+    g.items.forEach(i => {
+      const lc = i.location==='kr'?'pill-kr':i.location==='hk'?'pill-hk':'pill-both';
+      const ll = i.location==='kr'?'Korea':i.location==='hk'?'HK':'Both';
+      const pc = i.priority==='high'?'ph':i.priority==='med'?'pm':'pl';
+      html += `<div class="cl-i" onclick="toggleCLItem(this)" data-tag="${i.location}" data-priority="${i.priority}">
+        <div class="pdot ${pc}"></div>
+        <div class="cb"><div class="ck"></div></div>
+        <div class="cl-body-i">
+          <div class="cl-title">${i.title}</div>
+          <div class="cl-meta"><span class="pill ${lc}">${ll}</span><span class="due${i.urgent?' urg':''}">${i.due}</span></div>
+        </div></div>`;
+    });
+    html += '</div>';
+  });
+  document.getElementById('cl-body').innerHTML = html;
+}
+
+function toggleCLItem(el) {
+  el.classList.toggle('done');
+  const cb = el.querySelector('.cb');
+  cb.classList.toggle('on');
+}
+
+// ── US ──
+function openChat(id) {
+  curChat = id;
+  const t = threads.find(x => x.id === id);
+  document.getElementById('chat-title').textContent = t.name;
+  const msgs = document.getElementById('chat-msgs');
+  msgs.innerHTML = t.msgs.map(m => `<div class="mw${m.me?' me':''}"><div class="bub ${m.me?'me':'them'}">${m.text}</div><div class="msg-t${m.me?' r':''}">${m.me?'You':'Jimmy'}, ${m.time}</div></div>`).join('');
+  document.getElementById('us-list').style.display = 'none';
+  document.getElementById('chat-view').classList.add('open');
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function closeChat() {
+  document.getElementById('us-list').style.display = 'block';
+  document.getElementById('chat-view').classList.remove('open');
+}
+
+function sendMsg() {
+  const inp = document.getElementById('chat-inp');
+  const text = inp.value.trim(); if (!text) return;
+  const msgs = document.getElementById('chat-msgs');
+  const now = new Date();
+  const t = now.getHours()+':'+(now.getMinutes()<10?'0':'')+now.getMinutes();
+  msgs.innerHTML += `<div class="mw me"><div class="bub me">${text}</div><div class="msg-t r">You, ${t}</div></div>`;
+  inp.value = ''; msgs.scrollTop = msgs.scrollHeight;
+  const replies = ['Got it! 💕','Sounds good 😊','Let\'s decide together!','Love you ❤️','I\'ll check on that!'];
+  setTimeout(() => {
+    msgs.innerHTML += `<div class="mw"><div class="bub them">${replies[Math.floor(Math.random()*replies.length)]}</div><div class="msg-t">Jimmy, just now</div></div>`;
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 1200);
+}
+
+// ── BUDGET ──
+function switchBudget(el, tab) {
+  document.querySelectorAll('.btab').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  document.querySelectorAll('.bsec').forEach(s => s.classList.remove('on'));
+  document.getElementById('b-'+tab).classList.add('on');
+}
+
+// ── TIMELINE ──
+function renderTL(filter) {
+  const tl = document.getElementById('tl');
+  const items = filter === 'all' ? tlItems : tlItems.filter(i => i.tag === filter || i.tag === 'both');
+  tl.innerHTML = items.map((i, idx) => {
+    const dotStyle = i.dot==='done' ? 'background:#D4537E;border-color:#D4537E;' :
+      i.dot==='now' ? 'background:white;border-color:#D4537E;' :
+      i.dot==='kr' ? 'background:var(--green-light);border-color:#639922;' :
+      'background:var(--blue-light);border-color:#378ADD;';
+    const pills = i.pills.map(p => `<span class="pill pill-${p}">${p==='kr'?'Korea':p==='hk'?'HK':'Both'}</span>`).join('');
+    const urg = i.urgent ? '<span style="font-size:10px;color:#E24B4A;font-weight:500;">Urgent</span>' : '';
+    const isLast = idx === items.length - 1;
+    return `<div class="tl-item" data-tag="${i.tag}">
+      <div class="tl-left"><div class="tl-dot" style="${dotStyle}"></div>${!isLast?'<div class="tl-line"></div>':''}</div>
+      <div class="tl-r"><div class="tl-month">${i.month}</div><div class="tl-t">${i.title}</div><div class="tl-d">${i.desc}</div><div class="tl-tags">${pills}${urg}</div></div>
+    </div>`;
+  }).join('');
+}
+
+function switchTL(el, tab) {
+  document.querySelectorAll('.tlt').forEach(t => { t.className = 'tlt'; });
+  el.classList.add('on-'+tab);
+  renderTL(tab);
+}
+
+init();
+</script>
+</body>
+</html>
