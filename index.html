@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ForUs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --rose: #C8506A;
+      --rose-light: #F5E8EC;
+      --rose-mid: #E8B4C0;
+      --rose-dark: #8B3348;
+      --rose-deeper: #5C1F30;
+      --sage: #6B8F71;
+      --sage-light: #EAF0EB;
+      --navy: #2C4A6E;
+      --navy-light: #E8EFF7;
+      --gold: #B8960C;
+      --gold-light: #F7F2DF;
+      --ink: #1C1917;
+      --ink-mid: #57534E;
+      --ink-light: #A8A29E;
+      --cream: #FDFBF8;
+      --cream2: #F5F0EB;
+      --border: rgba(28,25,23,0.08);
+      --r: 14px;
+      --r-sm: 8px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; }
+    body { font-family: 'Jost', sans-serif; background: var(--cream2); display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
+    .app { width: 100%; max-width: 430px; min-height: 100vh; background: var(--cream); display: flex; flex-direction: column; position: relative; }
+
+    /* TOP */
+    .topbar { padding: 52px 22px 0; display: flex; justify-content: space-between; align-items: flex-start; }
+    .logo { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 400; color: var(--ink); letter-spacing: -0.5px; line-height: 1; }
+    .logo em { color: var(--rose); font-style: italic; }
+    .couple-tag { display: flex; align-items: center; gap: 5px; border: 0.5px solid var(--border); border-radius: 20px; padding: 5px 12px; background: white; }
+    .av { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 500; letter-spacing: 0.3px; }
+    .av1 { background: var(--rose-light); color: var(--rose-dark); }
+    .av2 { background: var(--navy-light); color: var(--navy); }
+    .couple-tag span { font-size: 11px; color: var(--ink-mid); letter-spacing: 0.3px; }
+
+    /* SCREENS */
+    .screen { display: none; flex: 1; flex-direction: column; padding-bottom: 90px; overflow-y: auto; }
+    .screen.active { display: flex; }
+
+    /* NAV */
+    .nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: var(--cream); border-top: 0.5px solid var(--border); padding: 12px 0 28px; display: flex; z-index: 100; }
+    .ni { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+    .ni-icon { width: 24px; height: 24px; position: relative; }
+    .ni span { font-size: 10px; color: var(--ink-light); letter-spacing: 0.5px; text-transform: uppercase; font-weight: 400; transition: color 0.2s; }
+    .ni.on span { color: var(--rose); }
+    .ni-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--rose); position: absolute; bottom: -2px; left: 50%; transform: translateX(-50%); display: none; }
+    .ni.on .ni-dot { display: block; }
+
+    /* DIVIDER */
+    .div { height: 0.5px; background: var(--border); margin: 0 22px; }
+
+    /* ===== HOME ===== */
+    .hero { margin: 20px 22px 0; background: var(--rose-light); border-radius: var(--r); padding: 22px; overflow: hidden; position: relative; }
+    .hero::before { content: ''; position: absolute; right: -20px; top: -20px; width: 120px; height: 120px; border-radius: 50%; background: rgba(200,80,106,0.07); }
+    .hero::after { content: ''; position: absolute; right: 20px; bottom: -30px; width: 80px; height: 80px; border-radius: 50%; background: rgba(200,80,106,0.05); }
+    .hero-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+    .dday-num { font-family: 'Cormorant Garamond', serif; font-size: 64px; color: var(--rose-deeper); line-height: 1; font-weight: 400; }
+    .dday-label { font-size: 10px; color: var(--rose-dark); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; font-weight: 500; }
+    .dday-sub { font-size: 12px; color: var(--rose-dark); margin-top: 6px; }
+    .hero-right { text-align: right; padding-top: 4px; }
+    .hero-date { font-family: 'Cormorant Garamond', serif; font-size: 16px; color: var(--rose-dark); margin-bottom: 8px; }
+    .vtag { font-size: 11px; color: var(--rose-dark); background: rgba(200,80,106,0.1); border-radius: 10px; padding: 3px 9px; display: inline-block; margin-bottom: 4px; }
+    .hero-divider { height: 0.5px; background: rgba(200,80,106,0.2); margin-bottom: 12px; }
+    .hero-progress { display: flex; justify-content: space-between; font-size: 11px; color: var(--rose-dark); margin-bottom: 6px; }
+    .prog { height: 3px; background: rgba(200,80,106,0.15); border-radius: 2px; overflow: hidden; }
+    .prog-fill { height: 100%; background: var(--rose); border-radius: 2px; transition: width 0.5s ease; }
+
+    .sec { padding: 20px 22px 0; }
+    .sh { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .st { font-size: 11px; font-weight: 500; color: var(--ink-light); text-transform: uppercase; letter-spacing: 1px; }
+    .sa { font-size: 12px; color: var(--rose); cursor: pointer; }
+
+    .task-item { display: flex; align-items: center; gap: 11px; padding: 12px 14px; background: white; border-radius: var(--r-sm); border: 0.5px solid var(--border); cursor: pointer; margin-bottom: 7px; transition: opacity 0.2s; }
+    .task-item.done { opacity: 0.38; }
+    .cb { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--rose-mid); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
+    .cb.on { background: var(--rose); border-color: var(--rose); }
+    .ck { width: 8px; height: 8px; border-right: 1.5px solid white; border-bottom: 1.5px solid white; transform: rotate(45deg) translate(-1px,-1px); display: none; }
+    .cb.on .ck { display: block; }
+    .ti { flex: 1; }
+    .ti-t { font-size: 13px; color: var(--ink); }
+    .ti-m { font-size: 11px; color: var(--ink-light); margin-top: 2px; }
+
+    .pill { font-size: 10px; padding: 2px 8px; border-radius: 8px; font-weight: 500; letter-spacing: 0.3px; }
+    .p-kr { background: var(--sage-light); color: var(--sage); }
+    .p-hk { background: var(--navy-light); color: var(--navy); }
+    .p-both { background: var(--rose-light); color: var(--rose-dark); }
+
+    .bsnap { background: white; border-radius: var(--r); border: 0.5px solid var(--border); padding: 16px; }
+    .bs-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px; }
+    .bs-total { font-family: 'Cormorant Garamond', serif; font-size: 24px; color: var(--ink); }
+    .bs-spent { font-size: 14px; font-weight: 500; color: var(--rose); }
+    .bs-meta { display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-light); margin-top: 6px; }
+
+    .preview-msgs { display: flex; flex-direction: column; gap: 8px; }
+    .bub { max-width: 78%; padding: 10px 13px; font-size: 13px; line-height: 1.5; }
+    .bub.them { background: white; border: 0.5px solid var(--border); color: var(--ink); border-radius: 4px 14px 14px 14px; }
+    .bub.me { background: var(--rose); color: white; border-radius: 14px 4px 14px 14px; align-self: flex-end; }
+    .mt { font-size: 10px; color: var(--ink-light); margin-top: 3px; letter-spacing: 0.3px; }
+    .mt.r { text-align: right; }
+
+    /* ===== CHECKLIST ===== */
+    .cl-header { padding: 20px 22px 14px; }
+    .cl-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .page-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; color: var(--ink); font-weight: 400; }
+    .cl-count { font-size: 12px; color: var(--ink-light); }
+    .filters { display: flex; gap: 6px; flex-wrap: wrap; }
+    .flt { font-size: 11px; padding: 5px 12px; border-radius: 12px; border: 0.5px solid var(--border); cursor: pointer; color: var(--ink-mid); background: white; transition: all 0.15s; letter-spacing: 0.3px; }
+    .flt.on { background: var(--rose); color: white; border-color: var(--rose); }
+    .cl-body { padding: 0 22px; }
+    .grp { margin-bottom: 18px; }
+    .grp-lbl { font-size: 10px; font-weight: 500; color: var(--ink-light); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .grp-line { flex: 1; height: 0.5px; background: var(--border); }
+    .cl-i { display: flex; align-items: flex-start; gap: 10px; padding: 11px 13px; border-radius: var(--r-sm); border: 0.5px solid var(--border); background: white; margin-bottom: 6px; cursor: pointer; transition: opacity 0.2s; }
+    .cl-i.done { opacity: 0.35; background: var(--cream2); }
+    .pdot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+    .ph { background: #C94040; }
+    .pm { background: #C28A20; }
+    .pl { background: var(--sage); }
+    .cl-c { flex: 1; }
+    .cl-t { font-size: 13px; color: var(--ink); line-height: 1.35; }
+    .cl-m { display: flex; gap: 6px; align-items: center; margin-top: 4px; flex-wrap: wrap; }
+    .due { font-size: 10px; color: var(--ink-light); }
+    .due.urg { color: #C94040; font-weight: 500; }
+
+    /* ADD TASK */
+    .add-task-box { margin: 0 22px 16px; background: white; border: 0.5px solid var(--border); border-radius: var(--r); padding: 14px; }
+    .add-row { display: flex; gap: 8px; margin-bottom: 8px; }
+    .add-inp { flex: 1; padding: 9px 12px; border-radius: var(--r-sm); border: 0.5px solid var(--border); font-size: 13px; color: var(--ink); font-family: 'Jost', sans-serif; background: var(--cream2); }
+    .add-inp:focus { outline: none; border-color: var(--rose); }
+    .add-selects { display: flex; gap: 6px; }
+    .add-sel { flex: 1; padding: 7px 10px; border-radius: var(--r-sm); border: 0.5px solid var(--border); font-size: 12px; color: var(--ink-mid); font-family: 'Jost', sans-serif; background: var(--cream2); }
+    .add-sel:focus { outline: none; border-color: var(--rose); }
+    .add-btn { padding: 9px 16px; background: var(--rose); color: white; border: none; border-radius: var(--r-sm); font-size: 12px; cursor: pointer; font-family: 'Jost', sans-serif; white-space: nowrap; letter-spacing: 0.3px; }
+
+    /* ===== US ===== */
+    .us-header { padding: 20px 22px 14px; }
+    .thread-list { display: flex; flex-direction: column; }
+    .thread { display: flex; gap: 13px; align-items: flex-start; padding: 14px 22px; border-bottom: 0.5px solid var(--border); cursor: pointer; transition: background 0.1s; }
+    .thread:hover { background: var(--cream2); }
+    .t-icon { width: 44px; height: 44px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .t-body { flex: 1; min-width: 0; }
+    .t-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; }
+    .t-name { font-size: 14px; font-weight: 500; color: var(--ink); }
+    .t-time { font-size: 11px; color: var(--ink-light); }
+    .t-prev { font-size: 12px; color: var(--ink-mid); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .t-unread { width: 8px; height: 8px; border-radius: 50%; background: var(--rose); margin-top: 6px; flex-shrink: 0; }
+
+    .chat-view { display: none; flex-direction: column; min-height: 100vh; }
+    .chat-view.open { display: flex; }
+    .chat-hd { padding: 52px 18px 12px; display: flex; align-items: center; gap: 12px; border-bottom: 0.5px solid var(--border); background: var(--cream); position: sticky; top: 0; z-index: 10; }
+    .back { font-size: 24px; color: var(--rose); cursor: pointer; line-height: 1; padding: 2px 6px; }
+    .chat-msgs { flex: 1; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; min-height: 400px; }
+    .mw { display: flex; flex-direction: column; }
+    .mw.me { align-items: flex-end; }
+    .chat-inp-area { padding: 12px 18px 32px; display: flex; gap: 9px; border-top: 0.5px solid var(--border); background: var(--cream); position: sticky; bottom: 0; }
+    .chat-inp { flex: 1; padding: 10px 14px; border-radius: 22px; border: 0.5px solid var(--border); background: white; font-size: 13px; color: var(--ink); font-family: 'Jost', sans-serif; }
+    .chat-inp:focus { outline: none; border-color: var(--rose); }
+    .send-btn { width: 38px; height: 38px; border-radius: 50%; background: var(--rose); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+    /* ===== BUDGET ===== */
+    .bud-hero { margin: 20px 22px 0; background: var(--rose-light); border-radius: var(--r); padding: 20px 22px; }
+    .bud-lbl { font-size: 10px; color: var(--rose-dark); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; font-weight: 500; }
+    .bud-big { font-family: 'Cormorant Garamond', serif; font-size: 40px; color: var(--rose-deeper); line-height: 1; margin-bottom: 12px; }
+    .bud-row { display: flex; justify-content: space-between; font-size: 11px; color: var(--rose-dark); margin-top: 6px; }
+    .btabs { display: flex; gap: 6px; margin: 14px 22px 0; }
+    .btab { flex: 1; padding: 9px; text-align: center; font-size: 11px; border-radius: var(--r-sm); border: 0.5px solid var(--border); cursor: pointer; color: var(--ink-mid); background: white; transition: all 0.15s; letter-spacing: 0.5px; text-transform: uppercase; }
+    .btab.on { background: var(--rose); color: white; border-color: var(--rose); }
+    .bsec { padding: 14px 22px 0; display: none; }
+    .bsec.on { display: block; }
+    .bi { display: flex; align-items: center; gap: 11px; padding: 12px 14px; border-radius: var(--r-sm); border: 0.5px solid var(--border); background: white; margin-bottom: 7px; }
+    .bi-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+    .bi-info { flex: 1; }
+    .bi-name { font-size: 13px; color: var(--ink); }
+    .bi-st { font-size: 10px; margin-top: 2px; letter-spacing: 0.3px; }
+    .bi-amt { font-size: 13px; font-weight: 500; color: var(--ink); text-align: right; }
+    .paid { color: var(--sage); }
+    .pend { color: var(--gold); }
+    .note-box { padding: 10px 13px; border-radius: var(--r-sm); font-size: 12px; margin-top: 4px; margin-bottom: 8px; }
+    .add-exp { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 11px; border-radius: var(--r-sm); border: 1px dashed var(--rose-mid); color: var(--rose); font-size: 12px; cursor: pointer; margin-top: 6px; letter-spacing: 0.3px; }
+
+    /* ===== TIMELINE ===== */
+    .tl-header { padding: 20px 22px 14px; }
+    .tl-tabs { display: flex; gap: 6px; margin: 0 22px 16px; }
+    .tlt { flex: 1; padding: 9px; text-align: center; font-size: 11px; border-radius: var(--r-sm); border: 0.5px solid var(--border); cursor: pointer; color: var(--ink-mid); background: white; transition: all 0.15s; text-transform: uppercase; letter-spacing: 0.5px; }
+    .tlt.on-all { background: var(--rose-light); color: var(--rose-dark); border-color: var(--rose-mid); }
+    .tlt.on-kr { background: var(--sage-light); color: var(--sage); border-color: #B5D4A8; }
+    .tlt.on-hk { background: var(--navy-light); color: var(--navy); border-color: #A8C0DC; }
+    .tl { padding: 0 22px; }
+    .tl-item { display: flex; gap: 16px; padding-bottom: 22px; }
+    .tl-left { display: flex; flex-direction: column; align-items: center; width: 28px; flex-shrink: 0; }
+    .tl-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid; flex-shrink: 0; }
+    .tl-line { width: 1px; flex: 1; background: var(--border); margin-top: 5px; }
+    .tl-r { flex: 1; padding-top: 0; }
+    .tl-mo { font-size: 10px; color: var(--ink-light); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; font-weight: 500; }
+    .tl-t { font-size: 14px; color: var(--ink); font-weight: 500; line-height: 1.3; }
+    .tl-d { font-size: 12px; color: var(--ink-mid); margin-top: 3px; line-height: 1.4; }
+    .tl-tags { display: flex; gap: 5px; margin-top: 7px; flex-wrap: wrap; }
+
+    /* EDIT / DELETE */
+    .item-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; opacity: 0; transition: opacity 0.15s; }
+    .cl-i:hover .item-actions,
+    .bi:hover .item-actions,
+    .tl-item:hover .item-actions { opacity: 1; }
+    .act-btn { width: 26px; height: 26px; border-radius: 6px; border: 0.5px solid var(--border); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; transition: background 0.1s; }
+    .act-btn:hover { background: var(--cream2); }
+    .act-btn.del:hover { background: #FEE; border-color: #FCC; }
+
+    /* MODAL */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(28,25,23,0.4); z-index: 200; align-items: flex-end; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--cream); border-radius: 20px 20px 0 0; padding: 24px 22px 40px; width: 100%; max-width: 430px; animation: slideUp 0.2s ease; }
+    @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .modal-title { font-family: 'Cormorant Garamond', serif; font-size: 20px; color: var(--ink); margin-bottom: 18px; }
+    .modal-field { margin-bottom: 12px; }
+    .modal-field label { font-size: 11px; color: var(--ink-light); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 5px; font-weight: 500; }
+    .modal-inp { width: 100%; padding: 10px 13px; border-radius: var(--r-sm); border: 0.5px solid var(--border); font-size: 13px; color: var(--ink); font-family: 'Jost', sans-serif; background: white; }
+    .modal-inp:focus { outline: none; border-color: var(--rose); }
+    .modal-row2 { display: flex; gap: 8px; }
+    .modal-row2 .modal-field { flex: 1; }
+    .modal-actions { display: flex; gap: 8px; margin-top: 18px; }
+    .modal-save { flex: 1; padding: 11px; background: var(--rose); color: white; border: none; border-radius: var(--r-sm); font-size: 13px; cursor: pointer; font-family: 'Jost', sans-serif; }
+    .modal-cancel { padding: 11px 18px; background: white; color: var(--ink-mid); border: 0.5px solid var(--border); border-radius: var(--r-sm); font-size: 13px; cursor: pointer; font-family: 'Jost', sans-serif; }
+    .modal-delete { padding: 11px 18px; background: white; color: #C94040; border: 0.5px solid #FCC; border-radius: var(--r-sm); font-size: 13px; cursor: pointer; font-family: 'Jost', sans-serif; }
+
+    /* ANIMATIONS */
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .screen.active { animation: fadeIn 0.2s ease; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="logo">For<em>Us</em></div>
+    <div class="couple-tag">
+      <div class="av av1">CY</div>
+      <span>+</span>
+      <div class="av av2">JY</div>
+      <span style="color:var(--ink-light);">our wedding</span>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <div class="screen active" id="s-home">
+    <div class="hero">
+      <div class="hero-top">
+        <div>
+          <div class="dday-label">Days to go</div>
+          <div class="dday-num" id="dday-num">—</div>
+          <div class="dday-sub">Korea ceremony</div>
+        </div>
+        <div class="hero-right">
+          <div class="hero-date">Nov 23, 2026</div>
+          <div><span class="vtag">Seoul</span></div>
+          <div style="margin-top:4px;"><span class="vtag">Hong Kong</span></div>
+        </div>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-progress">
+        <span>Planning progress</span>
+        <span id="prog-pct">32%</span>
+      </div>
+      <div class="prog"><div class="prog-fill" id="prog-fill" style="width:32%;"></div></div>
+    </div>
+
+    <div class="sec">
+      <div class="sh"><span class="st">This week</span><span class="sa" onclick="switchTab('checklist')">See all</span></div>
+      <div class="task-item" onclick="toggleTask(this)">
+        <div class="cb"><div class="ck"></div></div>
+        <div class="ti">
+          <div style="display:flex;justify-content:space-between;align-items:center;"><span class="ti-t">Book venue deposit</span><span class="pill p-kr">Korea</span></div>
+          <div class="ti-m">Due in 3 days — urgent</div>
+        </div>
+      </div>
+      <div class="task-item done" onclick="toggleTask(this)">
+        <div class="cb on"><div class="ck"></div></div>
+        <div class="ti">
+          <div style="display:flex;justify-content:space-between;align-items:center;"><span class="ti-t">Meet both families</span><span class="pill p-both">Both</span></div>
+          <div class="ti-m">Completed ✓</div>
+        </div>
+      </div>
+      <div class="task-item" onclick="toggleTask(this)">
+        <div class="cb"><div class="ck"></div></div>
+        <div class="ti">
+          <div style="display:flex;justify-content:space-between;align-items:center;"><span class="ti-t">Confirm HK guest list</span><span class="pill p-hk">HK</span></div>
+          <div class="ti-m">Due this week</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="div" style="margin-top:20px;"></div>
+
+    <div class="sec">
+      <div class="sh"><span class="st">Budget</span><span class="sa" onclick="switchTab('budget')">Details</span></div>
+      <div class="bsnap">
+        <div class="bs-row">
+          <div><div style="font-size:11px;color:var(--ink-light);margin-bottom:3px;">Total budget</div><div class="bs-total">HKD 380,000</div></div>
+          <div style="text-align:right;"><div style="font-size:11px;color:var(--ink-light);margin-bottom:3px;">Spent</div><div class="bs-spent">HKD 159,600</div></div>
+        </div>
+        <div class="prog"><div class="prog-fill" style="width:42%;"></div></div>
+        <div class="bs-meta"><span>HK: 80K</span><span style="color:var(--rose);font-weight:500;">42% used</span><span>Korea: 300K</span></div>
+      </div>
+    </div>
+
+    <div class="div" style="margin-top:20px;"></div>
+
+    <div class="sec" style="padding-bottom:0;">
+      <div class="sh"><span class="st">Us</span><span class="sa" onclick="switchTab('us')">Open</span></div>
+      <div class="preview-msgs">
+        <div><div class="bub them">50 or 80 people for the HK dinner?</div><div class="mt">Jimmy · 2:14 PM</div></div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;"><div class="bub me">I think 50 is more intimate 💕</div><div class="mt r">You · 2:31 PM</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECKLIST -->
+  <div class="screen" id="s-checklist">
+    <div class="cl-header">
+      <div class="cl-title-row">
+        <div class="page-title">Checklist</div>
+        <div class="cl-count" id="cl-count">0 / 0 done</div>
+      </div>
+      <div class="filters">
+        <div class="flt on" onclick="filterCL(this,'all')">All</div>
+        <div class="flt" onclick="filterCL(this,'kr')">Korea</div>
+        <div class="flt" onclick="filterCL(this,'hk')">HK</div>
+        <div class="flt" onclick="filterCL(this,'both')">Both</div>
+        <div class="flt" onclick="filterCL(this,'high')">Urgent</div>
+      </div>
+    </div>
+
+    <div class="add-task-box">
+      <div class="add-row">
+        <input class="add-inp" id="task-inp" placeholder="Add a new task..." onkeydown="if(event.key==='Enter')addTask()">
+        <button class="add-btn" onclick="addTask()">Add</button>
+      </div>
+      <div class="add-selects">
+        <select class="add-sel" id="task-loc">
+          <option value="both">Both</option>
+          <option value="kr">Korea</option>
+          <option value="hk">HK</option>
+        </select>
+        <select class="add-sel" id="task-pri">
+          <option value="med">Normal</option>
+          <option value="high">Urgent</option>
+          <option value="low">Low</option>
+        </select>
+        <input class="add-inp" id="task-due" placeholder="Due date" style="flex:1.5;">
+      </div>
+    </div>
+
+    <div class="cl-body" id="cl-body"></div>
+  </div>
+
+  <!-- US -->
+  <div class="screen" id="s-us">
+    <div id="us-list">
+      <div class="us-header"><div class="page-title">Us</div></div>
+      <div class="thread-list" id="thread-list"></div>
+    </div>
+    <div class="chat-view" id="chat-view">
+      <div class="chat-hd">
+        <div class="back" onclick="closeChat()">‹</div>
+        <div>
+          <div style="font-size:15px;font-weight:500;color:var(--ink);" id="chat-title"></div>
+          <div style="font-size:11px;color:var(--ink-light);">CY + JY · private</div>
+        </div>
+      </div>
+      <div class="chat-msgs" id="chat-msgs"></div>
+      <div class="chat-inp-area">
+        <input class="chat-inp" id="chat-inp" placeholder="Message Jimmy..." onkeydown="if(event.key==='Enter')sendMsg()">
+        <button class="send-btn" onclick="sendMsg()">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7L13 1L9 13L7 8L1 7Z" fill="white"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BUDGET -->
+  <div class="screen" id="s-budget">
+    <div class="bud-hero">
+      <div class="bud-lbl">Total budget</div>
+      <div class="bud-big">HKD 380,000</div>
+      <div class="prog"><div class="prog-fill" style="width:42%;"></div></div>
+      <div class="bud-row"><span>Spent: HKD 159,600</span><span>42%</span><span>Left: HKD 220,400</span></div>
+    </div>
+    <div class="btabs">
+      <div class="btab on" onclick="switchBudget(this,'all')">All</div>
+      <div class="btab" onclick="switchBudget(this,'hk')">Hong Kong</div>
+      <div class="btab" onclick="switchBudget(this,'kr')">Korea</div>
+    </div>
+    <div class="bsec on" id="b-all"></div>
+    <div class="bsec" id="b-hk"></div>
+    <div class="bsec" id="b-kr"></div>
+  </div>
+
+  <!-- TIMELINE -->
+  <div class="screen" id="s-timeline">
+    <div class="tl-header"><div class="page-title">Timeline</div></div>
+    <div class="tl-tabs">
+      <div class="tlt on-all" onclick="switchTL(this,'all')">All</div>
+      <div class="tlt" onclick="switchTL(this,'kr')">Korea 🇰🇷</div>
+      <div class="tlt" onclick="switchTL(this,'hk')">HK 🇭🇰</div>
+    </div>
+    <div class="tl" id="tl"></div>
+  </div>
+
+  <!-- EDIT MODAL -->
+  <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+    <div class="modal" id="modal">
+      <div class="modal-title" id="modal-title">Edit</div>
+      <div id="modal-body"></div>
+      <div class="modal-actions" id="modal-actions"></div>
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="ni on" id="ni-home" onclick="switchTab('home')">
+      <div class="ni-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M3 11.5L11 4L19 11.5V19H14V14H8V19H3V11.5Z" fill="var(--ink-light)" id="ico-home"/></svg>
+        <div class="ni-dot"></div>
+      </div>
+      <span>Home</span>
+    </div>
+    <div class="ni" id="ni-checklist" onclick="switchTab('checklist')">
+      <div class="ni-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="5" y="6" width="12" height="1.5" rx="0.75" fill="var(--ink-light)"/><rect x="5" y="10" width="12" height="1.5" rx="0.75" fill="var(--ink-light)"/><rect x="5" y="14" width="8" height="1.5" rx="0.75" fill="var(--ink-light)"/></svg>
+        <div class="ni-dot"></div>
+      </div>
+      <span>List</span>
+    </div>
+    <div class="ni" id="ni-us" onclick="switchTab('us')">
+      <div class="ni-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 6C4 5.45 4.45 5 5 5H17C17.55 5 18 5.45 18 6V14C18 14.55 17.55 15 17 15H8.5L5 18V15H5C4.45 15 4 14.55 4 14V6Z" fill="var(--ink-light)"/></svg>
+        <div class="ni-dot"></div>
+      </div>
+      <span>Us</span>
+    </div>
+    <div class="ni" id="ni-budget" onclick="switchTab('budget')">
+      <div class="ni-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="8" stroke="var(--ink-light)" stroke-width="1.5" fill="none"/><path d="M11 7V8M11 14V15M8.5 10C8.5 9.17 9.17 8.5 10 8.5H12C12.83 8.5 13.5 9.17 13.5 10C13.5 10.83 12.83 11.5 12 11.5H10C9.17 11.5 8.5 12.17 8.5 13C8.5 13.83 9.17 14.5 10 14.5H12C12.83 14.5 13.5 13.83 13.5 13" stroke="var(--ink-light)" stroke-width="1.5" fill="none"/></svg>
+        <div class="ni-dot"></div>
+      </div>
+      <span>Budget</span>
+    </div>
+    <div class="ni" id="ni-timeline" onclick="switchTab('timeline')">
+      <div class="ni-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="3" y="5" width="16" height="14" rx="2" stroke="var(--ink-light)" stroke-width="1.5" fill="none"/><path d="M8 4V6M14 4V6M3 9H19" stroke="var(--ink-light)" stroke-width="1.5"/></svg>
+        <div class="ni-dot"></div>
+      </div>
+      <span>Timeline</span>
+    </div>
+  </nav>
+</div>
+
+<script>
+// ── DATA ──
+const tlData = [
+  {tag:'both',dot:'done',month:'Completed',title:'양가 상견례',desc:'Both families met ✓',pills:['both']},
+  {tag:'both',dot:'now',month:'Now — April 2026',title:'Venue deposit & guest list',desc:'Confirm venues and finalize numbers for both ceremonies',pills:['both'],urgent:true},
+  {tag:'kr',dot:'kr',month:'May 2026',title:'스드메 — Studio, Dress, Makeup',desc:'Book photography studio, wedding dress fitting, and makeup artist in Seoul',pills:['kr']},
+  {tag:'both',dot:'kr',month:'June 2026',title:'Send invitations',desc:'청첩장 — Korea & HK invitations go out 6 months before',pills:['both']},
+  {tag:'kr',dot:'kr',month:'Aug 2026',title:'Pre-wedding shoot in Seoul',desc:'Pre-wedding (웨딩 촬영) photo session',pills:['kr']},
+  {tag:'hk',dot:'hk',month:'Sep 2026',title:'HK dinner prep',desc:'Finalise menu, seating plan, and décor for HK dinner',pills:['hk']},
+  {tag:'hk',dot:'hk',month:'Oct 2026',title:'Hong Kong ceremony 🇭🇰',desc:'Intimate dinner with HK family & friends',pills:['hk']},
+  {tag:'kr',dot:'kr',month:'Nov 23, 2026',title:'Korea wedding ceremony 🇰🇷',desc:'Main wedding ceremony in Seoul — 함, 폐백, and the big day!',pills:['kr']}
+];
+
+const threads = [
+  {id:'general',icon:'💬',bg:'#F5E8EC',name:'General',time:'2:31 PM',preview:'I think 50 is more intimate 💕',unread:true,
+   msgs:[{me:false,text:'Should we invite 50 or 80 people to the HK dinner?',t:'2:14 PM'},{me:true,text:'I think 50 is more intimate 💕',t:'2:31 PM'}]},
+  {id:'budget',icon:'💰',bg:'#EAF0EB',name:'Budget & Finance',time:'Yesterday',preview:'Can we talk about the housing deposit?',unread:true,
+   msgs:[{me:false,text:'Can we talk about the housing deposit?',t:'Yesterday'},{me:true,text:"Yes — let's set aside HKD 200K for the down payment first",t:'Yesterday'},{me:false,text:'Agreed. Split 50/50?',t:'Yesterday'}]},
+  {id:'family',icon:'👪',bg:'#E8EFF7',name:'Family & Parents',time:'Mon',preview:'My mom asked about the ceremony format',
+   msgs:[{me:false,text:'My mom asked about the ceremony format',t:'Monday'},{me:true,text:'What exactly did she say?',t:'Monday'},{me:false,text:'She wants to know if there will be a 茶道 ceremony',t:'Monday'}]},
+  {id:'venue',icon:'📍',bg:'#F7F2DF',name:'Venues',time:'Sun',preview:'Shortlisted 3 venues in Seoul',
+   msgs:[{me:true,text:'Shortlisted 3 venues in Seoul',t:'Sunday'},{me:false,text:'Oh exciting! Which ones?',t:'Sunday'},{me:true,text:'Shilla Hotel, Conrad Seoul, and a garden venue',t:'Sunday'}]},
+  {id:'wishes',icon:'✨',bg:'#F5E8EC',name:'Wishes & Dreams',time:'Apr 12',preview:'I want white roses everywhere 🌹',
+   msgs:[{me:true,text:'I want white roses everywhere 🌹',t:'Apr 12'},{me:false,text:'And fairy lights! 🌟',t:'Apr 12'}]}
+];
+
+let clTasks = [
+  {title:'Book venue deposit',loc:'kr',pri:'high',due:'Apr 22',done:false},
+  {title:'양가 상견례 (Family meeting)',loc:'both',pri:'low',due:'Done',done:true},
+  {title:'Confirm HK guest list',loc:'hk',pri:'high',due:'This week',done:false},
+  {title:'Book 스드메 (Studio, Dress, Makeup)',loc:'kr',pri:'med',due:'May 2026',done:false},
+  {title:'Set official wedding date',loc:'both',pri:'med',due:'May 2026',done:false},
+  {title:'Research HK ceremony formats',loc:'hk',pri:'low',due:'May 2026',done:false},
+  {title:'Send Korea invitations (청첩장)',loc:'kr',pri:'low',due:'Jun 2026',done:false},
+  {title:'Send HK invitations',loc:'hk',pri:'low',due:'Jun 2026',done:false},
+];
+
+let curChat = null;
+
+// ── INIT ──
+function init() {
+  const target = new Date('2026-11-23');
+  const diff = Math.ceil((target - new Date()) / 86400000);
+  document.getElementById('dday-num').textContent = diff > 0 ? diff : 0;
+  renderThreads();
+  renderCL();
+  renderBudgetItems('all');
+  renderTL('all');
+}
+
+// ── TABS ──
+function switchTab(tab) {
+  ['home','checklist','us','budget','timeline'].forEach(t => {
+    document.getElementById('s-'+t).classList.remove('active');
+    document.getElementById('ni-'+t).classList.remove('on');
+  });
+  document.getElementById('s-'+tab).classList.add('active');
+  document.getElementById('ni-'+tab).classList.add('on');
+  if (tab === 'checklist') renderCL();
+}
+
+// ── HOME TASKS ──
+function toggleTask(el) {
+  el.classList.toggle('done');
+  el.querySelector('.cb').classList.toggle('on');
+}
+
+// ── CHECKLIST ──
+function renderCL(filter) {
+  filter = filter || document.querySelector('.flt.on')?.dataset?.filter || 'all';
+  const body = document.getElementById('cl-body');
+  const done = clTasks.filter(t => t.done).length;
+  document.getElementById('cl-count').textContent = `${done} / ${clTasks.length} done`;
+
+  const filtered = filter === 'all' ? clTasks :
+    filter === 'high' ? clTasks.filter(t => t.pri === 'high') :
+    clTasks.filter(t => t.loc === filter || t.loc === 'both');
+
+  const urgent = filtered.filter(t => t.pri === 'high' && !t.done);
+  const normal = filtered.filter(t => t.pri !== 'high' && !t.done);
+  const doneItems = filtered.filter(t => t.done);
+
+  let html = '';
+  if (urgent.length) html += renderGroup('Urgent', urgent);
+  if (normal.length) html += renderGroup('To do', normal);
+  if (doneItems.length) html += renderGroup('Completed', doneItems);
+  if (!filtered.length) html = '<div style="text-align:center;padding:24px;color:var(--ink-light);font-size:13px;">No tasks here yet</div>';
+  body.innerHTML = html;
+}
+
+function renderGroup(label, items) {
+  const pDot = p => p==='high'?'ph':p==='med'?'pm':'pl';
+  const pLoc = l => l==='kr'?'p-kr':l==='hk'?'p-hk':'p-both';
+  const pLbl = l => l==='kr'?'Korea':l==='hk'?'HK':'Both';
+  return `<div class="grp"><div class="grp-lbl">${label}<div class="grp-line"></div></div>` +
+    items.map((t) => {
+      const idx = clTasks.indexOf(t);
+      return `<div class="cl-i${t.done?' done':''}">
+        <div onclick="toggleCLItem(${idx})" style="display:flex;align-items:flex-start;gap:10px;flex:1;cursor:pointer;">
+          <div class="pdot ${pDot(t.pri)}" style="margin-top:5px;"></div>
+          <div class="cb${t.done?' on':''}"><div class="ck"></div></div>
+          <div class="cl-c">
+            <div class="cl-t">${t.title}</div>
+            <div class="cl-m"><span class="pill ${pLoc(t.loc)}">${pLbl(t.loc)}</span><span class="due${t.pri==='high'&&!t.done?' urg':''}">${t.due}</span></div>
+          </div>
+        </div>
+        <div class="item-actions">
+          <button class="act-btn" onclick="editTask(${idx})" title="Edit">✎</button>
+          <button class="act-btn del" onclick="deleteTask(${idx})" title="Delete">✕</button>
+        </div>
+      </div>`;
+    }).join('') + '</div>';
+}
+
+function toggleCLItem(idx) {
+  clTasks[idx].done = !clTasks[idx].done;
+  renderCL();
+  const done = clTasks.filter(t => t.done).length;
+  const pct = Math.round(done / clTasks.length * 100);
+  document.getElementById('prog-pct').textContent = pct + '%';
+  document.getElementById('prog-fill').style.width = pct + '%';
+}
+
+function filterCL(el, tag) {
+  document.querySelectorAll('.flt').forEach(f => { f.classList.remove('on'); f.dataset.filter = f.textContent.toLowerCase(); });
+  el.classList.add('on');
+  renderCL(tag);
+}
+
+function addTask() {
+  const inp = document.getElementById('task-inp');
+  const title = inp.value.trim();
+  if (!title) return;
+  clTasks.unshift({
+    title,
+    loc: document.getElementById('task-loc').value,
+    pri: document.getElementById('task-pri').value,
+    due: document.getElementById('task-due').value || '—',
+    done: false
+  });
+  inp.value = '';
+  document.getElementById('task-due').value = '';
+  renderCL('all');
+}
+
+// ── US ──
+function renderThreads() {
+  document.getElementById('thread-list').innerHTML = threads.map(t =>
+    `<div class="thread" onclick="openChat('${t.id}')">
+      <div class="t-icon" style="background:${t.bg}">${t.icon}</div>
+      <div class="t-body">
+        <div class="t-top"><span class="t-name">${t.name}</span><span class="t-time">${t.time}</span></div>
+        <div class="t-prev">${t.preview}</div>
+      </div>
+      ${t.unread ? '<div class="t-unread"></div>' : ''}
+    </div>`).join('');
+}
+
+function openChat(id) {
+  curChat = id;
+  const th = threads.find(x => x.id === id);
+  document.getElementById('chat-title').textContent = th.name;
+  const msgs = document.getElementById('chat-msgs');
+  msgs.innerHTML = th.msgs.map(m =>
+    `<div class="mw${m.me?' me':''}">
+      <div class="bub ${m.me?'me':'them'}">${m.text}</div>
+      <div class="mt${m.me?' r':''}">${m.me?'You':'Jimmy'} · ${m.t}</div>
+    </div>`).join('');
+  document.getElementById('us-list').style.display = 'none';
+  document.getElementById('chat-view').classList.add('open');
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function closeChat() {
+  document.getElementById('us-list').style.display = 'block';
+  document.getElementById('chat-view').classList.remove('open');
+}
+
+function sendMsg() {
+  const inp = document.getElementById('chat-inp');
+  const text = inp.value.trim(); if (!text) return;
+  const msgs = document.getElementById('chat-msgs');
+  const now = new Date();
+  const t = now.getHours()+':'+(now.getMinutes()<10?'0':'')+now.getMinutes();
+  msgs.innerHTML += `<div class="mw me"><div class="bub me">${text}</div><div class="mt r">You · ${t}</div></div>`;
+  inp.value = ''; msgs.scrollTop = msgs.scrollHeight;
+  const replies = ['Got it 💕','Sounds good to me 😊','Let\'s decide together!','Love you ❤️','I\'ll look into it!','Agree 🙌'];
+  setTimeout(() => {
+    msgs.innerHTML += `<div class="mw"><div class="bub them">${replies[Math.floor(Math.random()*replies.length)]}</div><div class="mt">Jimmy · just now</div></div>`;
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 1100);
+}
+
+// ── MODAL ──
+function openModal(title, bodyHTML, actionsHTML) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = bodyHTML;
+  document.getElementById('modal-actions').innerHTML = actionsHTML;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modal-overlay')) {
+    document.getElementById('modal-overlay').classList.remove('open');
+  }
+}
+
+// ── TASK EDIT / DELETE ──
+function editTask(idx) {
+  const t = clTasks[idx];
+  openModal('Edit task',
+    `<div class="modal-field"><label>Task</label><input class="modal-inp" id="e-title" value="${t.title}"></div>
+     <div class="modal-row2">
+       <div class="modal-field"><label>Location</label>
+         <select class="modal-inp" id="e-loc">
+           <option value="both"${t.loc==='both'?' selected':''}>Both</option>
+           <option value="kr"${t.loc==='kr'?' selected':''}>Korea</option>
+           <option value="hk"${t.loc==='hk'?' selected':''}>HK</option>
+         </select>
+       </div>
+       <div class="modal-field"><label>Priority</label>
+         <select class="modal-inp" id="e-pri">
+           <option value="med"${t.pri==='med'?' selected':''}>Normal</option>
+           <option value="high"${t.pri==='high'?' selected':''}>Urgent</option>
+           <option value="low"${t.pri==='low'?' selected':''}>Low</option>
+         </select>
+       </div>
+     </div>
+     <div class="modal-field"><label>Due date</label><input class="modal-inp" id="e-due" value="${t.due}"></div>`,
+    `<button class="modal-delete" onclick="deleteTask(${idx})">Delete</button>
+     <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+     <button class="modal-save" onclick="saveTask(${idx})">Save</button>`
+  );
+}
+
+function saveTask(idx) {
+  clTasks[idx].title = document.getElementById('e-title').value.trim() || clTasks[idx].title;
+  clTasks[idx].loc   = document.getElementById('e-loc').value;
+  clTasks[idx].pri   = document.getElementById('e-pri').value;
+  clTasks[idx].due   = document.getElementById('e-due').value || '—';
+  closeModal();
+  renderCL();
+}
+
+function deleteTask(idx) {
+  clTasks.splice(idx, 1);
+  closeModal();
+  renderCL();
+  updateProgress();
+}
+
+function updateProgress() {
+  const done = clTasks.filter(t => t.done).length;
+  const pct = clTasks.length ? Math.round(done / clTasks.length * 100) : 0;
+  document.getElementById('prog-pct').textContent = pct + '%';
+  document.getElementById('prog-fill').style.width = pct + '%';
+}
+
+// ── BUDGET EDIT ──
+let budgetItems = {
+  all: [
+    {name:'Korea venue',dot:'var(--rose)',amt:'HKD 180,000',status:'pend',statusTxt:'⏳ 30% paid',cat:'kr'},
+    {name:'HK dinner venue',dot:'var(--navy)',amt:'HKD 60,000',status:'pend',statusTxt:'⏳ pending',cat:'hk'},
+    {name:'스드메 (Studio, Dress, MU)',dot:'var(--sage)',amt:'HKD 70,000',status:'paid',statusTxt:'✓ deposit paid',cat:'kr'},
+    {name:'Photography',dot:'var(--gold)',amt:'HKD 28,000',status:'paid',statusTxt:'✓ booked',cat:'kr'},
+    {name:'Flowers & décor',dot:'#9B7BB8',amt:'HKD 22,000',status:'pend',statusTxt:'⏳ TBD',cat:'both'},
+    {name:'Buffer / misc',dot:'var(--ink-light)',amt:'HKD 20,000',status:'',statusTxt:'—',cat:'both'},
+  ]
+};
+
+function renderBudgetItems(tab) {
+  const items = tab === 'all' ? budgetItems.all :
+    budgetItems.all.filter(i => i.cat === tab || i.cat === 'both');
+  const sec = document.getElementById('b-'+tab);
+  if (!sec) return;
+  const itemsHTML = items.map((item, i) => {
+    const realIdx = budgetItems.all.indexOf(item);
+    return `<div class="bi">
+      <div class="bi-dot" style="background:${item.dot};"></div>
+      <div class="bi-info"><div class="bi-name">${item.name}</div><div class="bi-st ${item.status}">${item.statusTxt}</div></div>
+      <div class="bi-amt">${item.amt}</div>
+      <div class="item-actions">
+        <button class="act-btn" onclick="editBudgetItem(${realIdx})">✎</button>
+        <button class="act-btn del" onclick="deleteBudgetItem(${realIdx})">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+  const noteColor = tab === 'hk' ? 'background:var(--navy-light);color:var(--navy)' : tab === 'kr' ? 'background:var(--sage-light);color:var(--sage)' : '';
+  const noteText = tab === 'hk' ? 'HK subtotal: HKD 80,000' : tab === 'kr' ? 'Korea subtotal: HKD 300,000' : '';
+  const note = noteText ? `<div class="note-box" style="${noteColor}">${noteText}</div>` : '';
+  sec.innerHTML = itemsHTML + note + `<div class="add-exp" onclick="addBudgetItem('${tab}')">+ Add expense</div>`;
+}
+
+function editBudgetItem(idx) {
+  const item = budgetItems.all[idx];
+  openModal('Edit expense',
+    `<div class="modal-field"><label>Name</label><input class="modal-inp" id="b-name" value="${item.name}"></div>
+     <div class="modal-row2">
+       <div class="modal-field"><label>Amount</label><input class="modal-inp" id="b-amt" value="${item.amt}"></div>
+       <div class="modal-field"><label>Category</label>
+         <select class="modal-inp" id="b-cat">
+           <option value="both"${item.cat==='both'?' selected':''}>Both</option>
+           <option value="kr"${item.cat==='kr'?' selected':''}>Korea</option>
+           <option value="hk"${item.cat==='hk'?' selected':''}>HK</option>
+         </select>
+       </div>
+     </div>
+     <div class="modal-field"><label>Status</label>
+       <select class="modal-inp" id="b-status">
+         <option value="pend"${item.status==='pend'?' selected':''}>⏳ Pending</option>
+         <option value="paid"${item.status==='paid'?' selected':''}>✓ Paid</option>
+       </select>
+     </div>`,
+    `<button class="modal-delete" onclick="deleteBudgetItem(${idx})">Delete</button>
+     <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+     <button class="modal-save" onclick="saveBudgetItem(${idx})">Save</button>`
+  );
+}
+
+function saveBudgetItem(idx) {
+  const s = document.getElementById('b-status').value;
+  budgetItems.all[idx].name = document.getElementById('b-name').value.trim();
+  budgetItems.all[idx].amt  = document.getElementById('b-amt').value.trim();
+  budgetItems.all[idx].cat  = document.getElementById('b-cat').value;
+  budgetItems.all[idx].status = s;
+  budgetItems.all[idx].statusTxt = s === 'paid' ? '✓ paid' : '⏳ pending';
+  closeModal();
+  ['all','hk','kr'].forEach(t => renderBudgetItems(t));
+}
+
+function deleteBudgetItem(idx) {
+  budgetItems.all.splice(idx, 1);
+  closeModal();
+  ['all','hk','kr'].forEach(t => renderBudgetItems(t));
+}
+
+function addBudgetItem(cat) {
+  budgetItems.all.push({name:'New expense',dot:'var(--ink-light)',amt:'HKD 0',status:'pend',statusTxt:'⏳ pending',cat});
+  editBudgetItem(budgetItems.all.length - 1);
+}
+
+function switchBudget(el, tab) {
+  document.querySelectorAll('.btab').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  document.querySelectorAll('.bsec').forEach(s => s.classList.remove('on'));
+  const sec = document.getElementById('b-'+tab);
+  if (sec) { sec.classList.add('on'); renderBudgetItems(tab); }
+}
+
+// ── TIMELINE EDIT ──
+function renderTL(filter) {
+  const items = filter === 'all' ? tlData : tlData.filter(i => i.tag === filter || i.tag === 'both');
+  document.getElementById('tl').innerHTML = items.map((item, idx) => {
+    const realIdx = tlData.indexOf(item);
+    const dotStyle = item.dot==='done' ? `background:var(--rose);border-color:var(--rose);` :
+      item.dot==='now' ? `background:white;border-color:var(--rose);` :
+      item.dot==='kr' ? `background:var(--sage-light);border-color:var(--sage);` :
+      `background:var(--navy-light);border-color:var(--navy);`;
+    const pills = item.pills.map(p => `<span class="pill p-${p}">${p==='kr'?'Korea':p==='hk'?'HK':'Both'}</span>`).join('');
+    const urg = item.urgent ? '<span style="font-size:10px;color:#C94040;font-weight:500;letter-spacing:0.3px;">Urgent</span>' : '';
+    return `<div class="tl-item">
+      <div class="tl-left"><div class="tl-dot" style="${dotStyle}"></div>${idx<items.length-1?'<div class="tl-line"></div>':''}</div>
+      <div class="tl-r" style="flex:1;">
+        <div class="tl-mo">${item.month}</div>
+        <div class="tl-t">${item.title}</div>
+        <div class="tl-d">${item.desc}</div>
+        <div class="tl-tags">${pills}${urg}</div>
+      </div>
+      <div class="item-actions" style="flex-direction:column;">
+        <button class="act-btn" onclick="editTLItem(${realIdx})">✎</button>
+        <button class="act-btn del" onclick="deleteTLItem(${realIdx})">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function editTLItem(idx) {
+  const item = tlData[idx];
+  openModal('Edit milestone',
+    `<div class="modal-field"><label>Title</label><input class="modal-inp" id="tl-title" value="${item.title}"></div>
+     <div class="modal-field"><label>Description</label><input class="modal-inp" id="tl-desc" value="${item.desc}"></div>
+     <div class="modal-row2">
+       <div class="modal-field"><label>Month / Date</label><input class="modal-inp" id="tl-month" value="${item.month}"></div>
+       <div class="modal-field"><label>Category</label>
+         <select class="modal-inp" id="tl-tag">
+           <option value="both"${item.tag==='both'?' selected':''}>Both</option>
+           <option value="kr"${item.tag==='kr'?' selected':''}>Korea</option>
+           <option value="hk"${item.tag==='hk'?' selected':''}>HK</option>
+         </select>
+       </div>
+     </div>`,
+    `<button class="modal-delete" onclick="deleteTLItem(${idx})">Delete</button>
+     <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+     <button class="modal-save" onclick="saveTLItem(${idx})">Save</button>`
+  );
+}
+
+function saveTLItem(idx) {
+  const tag = document.getElementById('tl-tag').value;
+  tlData[idx].title = document.getElementById('tl-title').value.trim();
+  tlData[idx].desc  = document.getElementById('tl-desc').value.trim();
+  tlData[idx].month = document.getElementById('tl-month').value.trim();
+  tlData[idx].tag   = tag;
+  tlData[idx].pills = [tag];
+  closeModal();
+  renderTL(document.querySelector('.tlt[class*="on-"]')?.dataset?.filter || 'all');
+}
+
+function deleteTLItem(idx) {
+  tlData.splice(idx, 1);
+  closeModal();
+  renderTL('all');
+}
+
+function switchTL(el, tab) {
+  document.querySelectorAll('.tlt').forEach(t => t.className = 'tlt');
+  el.classList.add('on-'+tab);
+  el.dataset.filter = tab;
+  renderTL(tab);
+}
+
+init();
+</script>
+</body>
+</html>
